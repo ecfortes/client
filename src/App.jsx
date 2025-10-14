@@ -5,6 +5,7 @@ import PalletList from './components/PalletList.jsx';
 import PalletDetails from './components/PalletDetails.jsx';
 import PackList from './components/PackList.jsx';
 import ConfirmDialog from './components/ConfirmDialog.jsx';
+import PackOverview from './components/PackOverview/PackOverview.jsx';
 
 export default function App() {
   const [pallets, setPallets] = useState([]);
@@ -157,9 +158,9 @@ export default function App() {
             onDelete={handleDeletePallet}
           />
 
-          {selected && (
-            <PackList palletId={selected.id} seqPallet={selected.seq_pallet} />
-          )}
+          <PackList palletId={selected?.id ?? null} seqPallet={selected?.seq_pallet ?? null} />
+
+          <PackOverview />
         </main>
       </div>
 

@@ -1,0 +1,26 @@
+/* grid da tabela da view */
+.table_overview .t-head,
+.table_overview .t-row {
+  display: grid;
+  grid-template-columns:
+    110px      /* Data */
+    90px       /* Hora */
+    minmax(220px, 2fr) /* QR Pack */
+    120px      /* Origem */
+    80px       /* OT */
+    80px       /* Robô */
+    minmax(220px, 2fr) /* QR Pallet */
+    110px      /* Completed */
+    100px;     /* Doca */
+  gap: 8px;
+  align-items: center;
+}
+
+.table_overview .t-row > div:nth-child(3),
+.table_overview .t-row > div:nth-child(7) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table_overview { width: 100%; overflow-x: auto; }

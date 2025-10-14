@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { listPacks, listOrphanPacks, createPack, deletePack } from '../api.js';
+import { listPacks, listOrphanPacks, deletePack } from '../api.js';
 import PackEdit from './PackEdit.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
 
 export default function PackList({ palletId, seqPallet }) {
+  const palletLabel = seqPallet ?? palletId ?? '-';
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(20);
@@ -13,14 +14,16 @@ export default function PackList({ palletId, seqPallet }) {
   const [editing, setEditing] = useState(null); // { mode: 'create'|'edit', pack }
   const [confirm, setConfirm] = useState(null);
 
-  // Novo: modo "órfãos" (seq_pallet = null)
+  // Orphan mode keeps seq_pallet = null records visible
   const [orphansMode, setOrphansMode] = useState(false);
+  const hasPallet = palletId !== null && palletId !== undefined;
+  const effectiveOrphans = orphansMode || !hasPallet;
 
   async function load() {
     setLoading(true);
     setError('');
     try {
-      const data = orphansMode
+      const data = effectiveOrphans
         ? await listOrphanPacks({ limit, offset })
         : await listPacks(palletId, { limit, offset });
 
@@ -46,16 +49,28 @@ export default function PackList({ palletId, seqPallet }) {
     load();
   }, [palletId, limit, offset, orphansMode]);
 
+  useEffect(() => {
+    if (!hasPallet) {
+      setOrphansMode(true);
+    }
+  }, [hasPallet]);
+
   const page = Math.floor(offset / limit) + 1;
   const pageCount = Math.max(1, Math.ceil(total / limit));
 
   const handleAdd = async () => {
-    // Em orphansMode não faz sentido "criar" sem pallet; desabilitamos o botão.
-    if (orphansMode) return;
-    window.__currentPalletId = palletId;
     setEditing({
       mode: 'create',
-      pack: { qr_code: '', orig: '', seq_pack: '', lastpack: false, pospallet: '', robot_num: '' }
+      pack: {
+        qr_code: '',
+        orig: '',
+        seq_pack: Date.now(),
+        seq_pallet: effectiveOrphans ? null : seqPallet ?? '',
+        lastpack: false,
+        pospallet: '',
+        robot_num: ''
+      },
+      palletId: effectiveOrphans ? null : palletId
     });
   };
 
@@ -79,9 +94,9 @@ export default function PackList({ palletId, seqPallet }) {
     <div className="card">
       <div className="card-header">
         <h2>
-          {orphansMode
+          {effectiveOrphans
             ? 'Orphan Packs (seq_pallet = null)'
-            : `Packs for Pallet seq ${seqPallet}`}
+            : `Packs for Pallet seq ${palletLabel}`}
         </h2>
 
         <div className="pager">
@@ -89,8 +104,16 @@ export default function PackList({ palletId, seqPallet }) {
             <input
               type="checkbox"
               checked={orphansMode}
-              onChange={(e) => setOrphansMode(e.target.checked)}
-              title="Mostrar apenas registros com seq_pallet = null"
+              onChange={(e) => {
+                if (!hasPallet) return;
+                setOrphansMode(e.target.checked);
+              }}
+              disabled={!hasPallet}
+              title={
+                hasPallet
+                  ? 'Mostrar apenas registros com seq_pallet = null'
+                  : 'Habilitado automaticamente enquanto nenhum pallet estiver selecionado'
+              }
             />
             Only seq_pallet = null
           </label>
@@ -124,8 +147,6 @@ export default function PackList({ palletId, seqPallet }) {
           <button
             className="btn primary"
             onClick={handleAdd}
-            disabled={orphansMode}
-            title={orphansMode ? 'Criação desabilitada no modo órfãos' : undefined}
           >
             + Add Pack
           </button>
@@ -139,6 +160,7 @@ export default function PackList({ palletId, seqPallet }) {
         <div className="t-head">
           <div>ID</div>
           <div>QR</div>
+          <div>seq_pallet </div>
           <div>orig</div>
           <div>seq_pack</div>
           <div>lastpack</div>
@@ -152,6 +174,7 @@ export default function PackList({ palletId, seqPallet }) {
             <div className="t-row" key={p.id}>
               <div>{p.id}</div>
               <div title={p.qr_code || ''}>{p.qr_code || '—'}</div>
+              <div>{p.seq_pallet ?? '-'}</div>
               <div>{p.orig ?? '—'}</div>
               <div>{p.seq_pack ?? '—'}</div>
               <div>{p.lastpack ? 'Yes' : 'No'}</div>
@@ -165,7 +188,7 @@ export default function PackList({ palletId, seqPallet }) {
           ))}
           {!items.length && !loading && (
             <div className="t-row muted">
-              {orphansMode ? 'No orphan packs' : 'No pack items'}
+              {effectiveOrphans ? 'No orphan packs' : 'No pack items'}
             </div>
           )}
         </div>
@@ -175,6 +198,7 @@ export default function PackList({ palletId, seqPallet }) {
         <PackEdit
           mode={editing.mode}
           pack={editing.pack}
+          palletId={editing.palletId ?? null}
           onClose={() => setEditing(null)}
           onSaved={() => { setEditing(null); load(); }}
         />

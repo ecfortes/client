@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { updatePack, createPack } from '../api.js';
+import { updatePack, createPack, createOrphanPack } from '../api.js';
 import Modal from './Modal.jsx';
 
 function sanitizeNumber(v, allowFloat = true) {
@@ -10,12 +10,31 @@ function sanitizeNumber(v, allowFloat = true) {
   return num;
 }
 
-export default function PackEdit({ mode, pack, onClose, onSaved }) {
-  const [form, setForm] = useState(pack || {});
-  const [saving, setSaving] = useState(false);
+export default function PackEdit({ mode, pack, palletId = null, onClose, onSaved }) {
   const isCreate = mode === 'create';
+  const [form, setForm] = useState(() => {
+    if (isCreate) {
+      const base = pack || {};
+      const seq_pack = base.seq_pack ?? Date.now();
+      const seq_pallet = base.seq_pallet ?? (palletId ?? null);
+      return { ...base, seq_pack, seq_pallet };
+    }
+    return pack || {};
+  });
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => setForm(pack || {}), [pack]);
+  useEffect(() => {
+    if (isCreate) {
+      setForm((prev) => {
+        const base = pack || {};
+        const seq_pack = base.seq_pack ?? prev.seq_pack ?? Date.now();
+        const seq_pallet = base.seq_pallet ?? (palletId ?? prev.seq_pallet ?? null);
+        return { ...base, seq_pack, seq_pallet };
+      });
+    } else {
+      setForm(pack || {});
+    }
+  }, [isCreate, pack, palletId]);
 
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -25,6 +44,7 @@ export default function PackEdit({ mode, pack, onClose, onSaved }) {
     try {
       const payload = {
         qr_code: form.qr_code || null,
+        seq_pallet: sanitizeNumber(form.seq_pallet,false),
         orig: sanitizeNumber(form.orig, false),
         seq_pack: sanitizeNumber(form.seq_pack, true),
         lastpack: !!form.lastpack,
@@ -33,8 +53,11 @@ export default function PackEdit({ mode, pack, onClose, onSaved }) {
       };
 
       if (isCreate) {
-        if (!window.__currentPalletId) throw new Error('Missing current pallet context');
-        await createPack(window.__currentPalletId, payload);
+        if (palletId !== null && palletId !== undefined) {
+          await createPack(palletId, payload);
+        } else {
+          await createOrphanPack(payload);
+        }
       } else {
         await updatePack(form.id, payload);
       }
@@ -62,6 +85,14 @@ export default function PackEdit({ mode, pack, onClose, onSaved }) {
             <span>seq_pack</span>
             <input className="input" type="number" step="any" value={form.seq_pack ?? ''} onChange={(e) => update('seq_pack', e.target.value)} />
           </label>
+
+
+          <label className="field">
+            <span>seq_pallet</span>
+            <input className="input" type="number" step="any" value={form.seq_pallet ?? ''} onChange={(e) => update('seq_pallet', e.target.value)} />
+          </label>
+
+
           <label className="field">
             <span>lastpack</span>
             <input type="checkbox" checked={!!form.lastpack} onChange={(e) => update('lastpack', e.target.checked)} />

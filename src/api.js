@@ -43,6 +43,18 @@ export const createPack = (palletId, payload) => http(`/api/pallets/${palletId}/
 export const updatePack = (id, payload) => http(`/api/packs/${id}`, { method: 'PUT', body: payload });
 // Remove um pack definitivamente
 export const deletePack = (id) => http(`/api/packs/${id}`, { method: 'DELETE' });
+// Cria um pack sem vinculo de pallet (seq_pallet = null)
+export const createOrphanPack = (payload) => http('/api/packs/orphans', { method: 'POST', body: payload });
+// Lista overview agregado de packs com suporte a busca e paginacao
+export const listPackOverview = ({ limit = 20, offset = 0, search = '' } = {}) => {
+  const params = new URLSearchParams();
+  params.set('limit', String(limit));
+  params.set('offset', String(offset));
+  if (search) params.set('search', search);
+
+  const query = params.toString();
+  return http(`/api/packs/overview?${query}`);
+};
 
 // Ja existiam: listPacks, createPack, deletePack ...
 // Adicione esta funcao:
