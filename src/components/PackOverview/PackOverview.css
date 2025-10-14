@@ -5,11 +5,11 @@
   grid-template-columns:
     110px      /* Data */
     90px       /* Hora */
-    minmax(220px, 2fr) /* QR Pack */
+    280px
     120px      /* Origem */
     80px       /* OT */
-    80px       /* Robô */
-    minmax(220px, 2fr) /* QR Pallet */
+    80px       /* Robô */ 
+    150px
     110px      /* Completed */
     100px;     /* Doca */
   gap: 8px;
