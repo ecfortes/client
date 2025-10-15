@@ -1,14 +1,14 @@
 :root {
-  --bg: #0f1115;
-  --panel: #171a21;
-  --panel-2: #1e2230;
-  --text: #e6e8ef;
-  --muted: #94a3b8;
+  --bg: rgb(0, 81, 159);
+  --panel: rgb(255, 255, 255);
+  --panel-2: rgb(245, 247, 252);
+  --text: rgb(0, 0, 0);
+  --muted: #4b5563;
   --primary: #3b82f6;
   --danger: #ef4444;
   --ok: #10b981;
   --warn: #f59e0b;
-  --border: #2b3040;
+  --border: #cbd5f5;
 }
 
 * {
@@ -43,9 +43,21 @@ body {
   background: var(--panel);
 }
 
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .topbar h1 {
   font-size: 18px;
   margin: 0;
+}
+
+.app-logo {
+  height: 80px;
+  width: 80px;
+  object-fit: contain;
 }
 
 .badge {
@@ -76,11 +88,13 @@ body {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  background: var(--panel);
 }
 
 .main {
   padding: 16px;
   overflow: auto;
+  background: var(--panel);
 }
 
 .toolbar {
@@ -88,6 +102,7 @@ body {
   gap: 8px;
   padding: 12px;
   border-bottom: 1px solid var(--border);
+  background: var(--panel);
 }
 
 .card {
@@ -125,7 +140,7 @@ body {
 }
 
 .list-item.selected {
-  background: #1c2435;
+  background: #dbeafe;
 }
 
 .row {

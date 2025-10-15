@@ -17,10 +17,9 @@ export default function PackList({ palletId, seqPallet }) {
   // Orphan mode keeps seq_pallet = null records visible
   const [orphansMode, setOrphansMode] = useState(false);
   const hasPallet = palletId !== null && palletId !== undefined;
-  const effectiveOrphans = orphansMode || !hasPallet;
+  const effectiveOrphans = true
 
   async function load() {
-    setOrphansMode(false)
     setLoading(true);
     setError('');
     try {
@@ -65,7 +64,7 @@ export default function PackList({ palletId, seqPallet }) {
       pack: {
         qr_code: '',
         orig: '',
-        seq_pack: Date.now(),
+        seq_pack: (Date.now()/1000).toFixed(0),
         seq_pallet: effectiveOrphans ? null : seqPallet ?? '',
         lastpack: false,
         pospallet: '',
@@ -94,31 +93,10 @@ export default function PackList({ palletId, seqPallet }) {
   return (
     <div className="card">
       <div className="card-header">
-        <h2>
-          {effectiveOrphans
-            ? 'Orphan Packs (seq_pallet = null)'
-            : `Packs for Pallet seq ${palletLabel}`}
-        </h2>
+        <h2>Orphan Packs (seq_pallet = null)</h2>
 
         <div className="pager">
-          {/* <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input
-              type="checkbox"
-              checked={orphansMode}
-              onChange={(e) => {
-                if (!hasPallet) return;
-                setOrphansMode(e.target.checked);
-              }}
-              disabled={!hasPallet}
-              title={
-                hasPallet
-                  ? 'Mostrar apenas registros com seq_pallet = null'
-                  : 'Habilitado automaticamente enquanto nenhum pallet estiver selecionado'
-              }
-            />
-            Only seq_pallet = null
-          </label> */}
-
+         
           <label>Page {page} / {pageCount}</label>
           <button
             className="btn"

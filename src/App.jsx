@@ -4,8 +4,10 @@ import DatabaseConnection from './components/DatabaseConnection.jsx';
 import PalletList from './components/PalletList.jsx';
 import PalletDetails from './components/PalletDetails.jsx';
 import PackList from './components/PackList.jsx';
+import OrphanList from './components/OrphanList.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx';
 import PackOverview from './components/PackOverview/PackOverview.jsx';
+import logo from './assets/new_log.webp';
 
 export default function App() {
   const [pallets, setPallets] = useState([]);
@@ -62,9 +64,9 @@ export default function App() {
 
   const handleCreatePallet = async () => {
     // Default = Unix epoch em ms
-    const defaultSeq = Date.now();               // ex.: 1728234567890
+    //const defaultSeq = Date.now();               // ex.: 1728234567890
     // Se quiser em segundos:
-    // const defaultSeq = Math.floor(Date.now() / 1000); // ex.: 1728234567
+    const defaultSeq = Math.floor(Date.now() / 1000); // ex.: 1728234567
 
     const input = prompt('seq_pallet (number)', String(defaultSeq));
     if (input === null) return; // cancelado
@@ -120,8 +122,10 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <img src="" alt="" />
-        <h1>Pallet &amp; Pack Manager</h1>
+        <div className="topbar-title">
+          <img src={logo} alt="Pallet Pack Manager logo" className="app-logo" />
+          <h1>Pallet &amp; Pack Manager - ZIA</h1>
+        </div>
         <DatabaseConnection />
       </header>
 
@@ -149,6 +153,8 @@ export default function App() {
             onNext={() => setOffset(Math.min((pageCount - 1) * limit, offset + limit))}
             onChangeLimit={(n) => { setLimit(n); setOffset(0); }}
           />
+          <OrphanList palletId={selected?.id ?? null} seqPallet={selected?.seq_pallet ?? null} />
+
         </aside>
 
         <main className="main">
@@ -159,6 +165,7 @@ export default function App() {
           />
 
           <PackList palletId={selected?.id ?? null} seqPallet={selected?.seq_pallet ?? null} />
+
 
           <PackOverview />
         </main>
