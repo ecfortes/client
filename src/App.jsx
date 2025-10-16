@@ -138,7 +138,7 @@ export default function App() {
       <header className="topbar">
         <div className="topbar-title">
           <img src={logo} alt="Pallet Pack Manager logo" className="app-logo" />
-          <h1>Pallet &amp; Pack Manager - ZIA</h1>
+          <h1>ZIA - Pallet &amp; Pack Overview</h1>
         </div>
         <DatabaseConnection />
       </header>

@@ -39,7 +39,7 @@ export default function PackOverview() {
     return (
         <div className="card">
             <div className="card-header">
-                <h2>Packs Overview (vw_pack_overview)</h2>
+                <h2>Packs Overview</h2>
 
                 <div className="pager" style={{ gap: 8 }}>
                     <input
