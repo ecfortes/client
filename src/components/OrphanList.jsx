@@ -7,7 +7,7 @@ export default function PackList({ palletId, seqPallet }) {
   const palletLabel = seqPallet ?? palletId ?? '-';
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(5);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,7 +17,7 @@ export default function PackList({ palletId, seqPallet }) {
   // Orphan mode keeps seq_pallet = null records visible
   const [orphansMode, setOrphansMode] = useState(false);
   const hasPallet = palletId !== null && palletId !== undefined;
-  const effectiveOrphans = true
+  const effectiveOrphans = true;
 
   async function load() {
     setLoading(true);
@@ -64,7 +64,7 @@ export default function PackList({ palletId, seqPallet }) {
       pack: {
         qr_code: '',
         orig: '',
-        seq_pack: (Date.now()/1000).toFixed(0),
+        seq_pack: (Date.now() / 1000).toFixed(0),
         seq_pallet: effectiveOrphans ? null : seqPallet ?? '',
         lastpack: false,
         pospallet: '',
@@ -91,13 +91,12 @@ export default function PackList({ palletId, seqPallet }) {
   };
 
   return (
-    <div className="card">
+    <div className="card sidebar-card">
       <div className="card-header">
-        <h2>Orphan Packs (seq_pallet = null)</h2>
+        <h2>Orphan Packs</h2>
 
         <div className="pager">
-         
-          <label>Page {page} / {pageCount}</label>
+          <label> Page {page} / {pageCount} </label>
           <button
             className="btn"
             onClick={() => setOffset(Math.max(0, offset - limit))}
@@ -118,6 +117,7 @@ export default function PackList({ palletId, seqPallet }) {
             value={limit}
             onChange={(e) => { setLimit(Number(e.target.value)); }}
           >
+            <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
@@ -135,7 +135,7 @@ export default function PackList({ palletId, seqPallet }) {
       {error && <div className="error">{error}</div>}
       {loading && <div className="muted">Loading…</div>}
 
-      <div className="table">
+      <div className="list ">
         <div className="t-head">
           <div>ID</div>
           <div>QR</div>

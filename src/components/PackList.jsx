@@ -51,6 +51,20 @@ export default function PackList({ palletId, seqPallet }) {
   }, [palletId, limit, offset, orphansMode]);
 
   useEffect(() => {
+    if (total === 0) {
+      if (offset !== 0) {
+        setOffset(0);
+      }
+      return;
+    }
+
+    const lastPageOffset = Math.max(0, (Math.ceil(total / limit) - 1) * limit);
+    if (offset > lastPageOffset) {
+      setOffset(lastPageOffset);
+    }
+  }, [total, limit, offset]);
+
+  useEffect(() => {
     if (!hasPallet) {
       setOrphansMode(true);
     }
@@ -92,7 +106,7 @@ export default function PackList({ palletId, seqPallet }) {
   };
 
   return (
-    <div className="card">
+    <div className="card table-card">
       <div className="card-header">
         <h2>
           {effectiveOrphans

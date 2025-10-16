@@ -14,7 +14,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [selected, setSelected] = useState(null);
   const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(5);
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,6 +61,20 @@ export default function App() {
   useEffect(() => {
     loadSelected(selectedId);
   }, [selectedId]);
+
+  useEffect(() => {
+    if (total === 0) {
+      if (offset !== 0) {
+        setOffset(0);
+      }
+      return;
+    }
+
+    const lastPageOffset = Math.max(0, (Math.ceil(total / limit) - 1) * limit);
+    if (offset > lastPageOffset) {
+      setOffset(lastPageOffset);
+    }
+  }, [total, limit, offset]);
 
   const handleCreatePallet = async () => {
     // Default = Unix epoch em ms
@@ -131,29 +145,33 @@ export default function App() {
 
       <div className="content">
         <aside className="sidebar">
-          <div className="toolbar">
+          <div className="toolbar sidebar-toolbar">
             <input
               className="input"
-              placeholder="Search by QR code..."
+              placeholder="Searcdddh by QR code..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
             />
             <button className="btn primary" onClick={handleCreatePallet}>+ New Pallet</button>
           </div>
 
-          <PalletList
-            items={pallets}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            loading={loading}
-            error={error}
-            page={page}
-            pageCount={pageCount}
-            onPrev={() => setOffset(Math.max(0, offset - limit))}
-            onNext={() => setOffset(Math.min((pageCount - 1) * limit, offset + limit))}
-            onChangeLimit={(n) => { setLimit(n); setOffset(0); }}
-          />
-          <OrphanList palletId={selected?.id ?? null} seqPallet={selected?.seq_pallet ?? null} />
+          <div>
+            <PalletList
+              items={pallets}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              loading={loading}
+              error={error}
+              page={page}
+              pageCount={pageCount}
+              onPrev={() => setOffset(Math.max(0, offset - limit))}
+              onNext={() => setOffset(Math.min((pageCount - 1) * limit, offset + limit))}
+              limit={limit}
+              onChangeLimit={(n) => { setLimit(n); setOffset(0); }}
+            />
+
+            <OrphanList palletId={selected?.id ?? null} seqPallet={selected?.seq_pallet ?? null} />
+          </div>
 
         </aside>
 

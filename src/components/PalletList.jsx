@@ -1,8 +1,20 @@
 import React from 'react';
 
-export default function PalletList({ items, selectedId, onSelect, loading, error, page, pageCount, onPrev, onNext, onChangeLimit }) {
+export default function PalletList({
+  items,
+  selectedId,
+  onSelect,
+  loading,
+  error,
+  page,
+  pageCount,
+  onPrev,
+  onNext,
+  limit,
+  onChangeLimit
+}) {
   return (
-    <div className="card">
+    <div className="card sidebar-card">
       <div className="card-header">
         <h2>Pallets</h2>
         <div className="pager">
@@ -11,7 +23,12 @@ export default function PalletList({ items, selectedId, onSelect, loading, error
           </label>
           <button className="btn" onClick={onPrev} disabled={page <= 1}>Prev</button>
           <button className="btn" onClick={onNext} disabled={page >= pageCount}>Next</button>
-          <select className="input" defaultValue={20} onChange={(e) => onChangeLimit(Number(e.target.value))}>
+          <select
+            className="input"
+            value={limit ?? 5}
+            onChange={(e) => onChangeLimit(Number(e.target.value))}
+          >
+            <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={50}>50</option>
