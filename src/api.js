@@ -1,6 +1,8 @@
 // URL base da API vem das variaveis do Vite, com fallback para localhost em dev
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
 
+console.log('[api] Usando API_BASE:', API_BASE);
+
 // Wrapper que centraliza chamadas fetch, serializa JSON e lanca erros de resposta
 async function http(path, { method = 'GET', body } = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
